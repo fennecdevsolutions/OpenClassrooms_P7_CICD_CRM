@@ -14,29 +14,47 @@ jobs:
   # ===============================
   build-and-test-backend:
     runs-on: ubuntu-latest
-    steps:
+    steps: # install, build & test, provide reports as artefacts
+
       - uses: actions/checkout@v4
       - name: Installer Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Backend Build & Test
         run: |
           cd back
           chmod +x gradlew
           ./gradlew clean test
 
+      - name: Archive backend test report as artefact
+        uses: actions/upload-artifact@v4
+        if: always() # To upload even when the tests fail
+        with:
+          name: backend-test-results
+          path: back/build/reports/tests/test/
+
   build-and-test-frontend:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Frontend Build & Test
         run: |
           cd front
           npm ci
           npm run test:ci
+
+      - name: Archive frontend test report as artefact
+        uses: actions/upload-artifact@v4
+        if: always() # To upload even when the tests fail
+        with:
+          name: frontend-coverage-results
+          path: front/coverage/microcrm/
