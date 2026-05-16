@@ -36,6 +36,14 @@ jobs:
           name: backend-test-results
           path: back/build/reports/tests/test/
 
+      - name: Display backend test reports on Github Actions
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Backend test reports
+          path: back/build/test-results/test/*.xml
+          reporter: java-junit
+
   build-and-test-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -58,3 +66,11 @@ jobs:
         with:
           name: frontend-coverage-results
           path: front/coverage/microcrm/
+
+      - name: Display frontend test reports on Github Actions
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Frontend test reports
+          path: front/coverage/microcrm/TESTS-results.xml
+          reporter: java-junit
