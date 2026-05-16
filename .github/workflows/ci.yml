@@ -6,7 +6,12 @@ on:
       - '**'                  
   pull_request:
     branches:
-      - 'main'                
+      - 'main'     
+      
+permissions:
+  checks: write      # For tabs and test reports creation
+  pull-requests: write # For display on Pull Requests
+  contents: read   
 
 jobs:
   # ===============================
