@@ -1,0 +1,5 @@
+# All text files default to LF
+* text=auto eol=lf
+
+# gradlew must explicitly always be LF + executable
+back/gradlew text eol=lf
