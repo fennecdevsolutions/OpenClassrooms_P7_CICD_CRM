@@ -3,7 +3,6 @@ plugins {
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'com.adarshr.test-logger' version '4.0.0'
-	id 'org.sonarqube' version '7.3.0.8198'
 }
 
 group = 'com.openclassroom.devops.orion'
@@ -29,13 +28,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-sonar {
-    properties {
-        property "sonar.projectKey", "fennecdevsolutions_OpenClassrooms_P7_CICD_CRM"
-        property "sonar.organization", "fennecdevsolutions"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.junit.reportPaths", "build/test-results/test"
-    }
 }

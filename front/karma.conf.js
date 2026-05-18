@@ -28,7 +28,7 @@ module.exports = function (config) {
     coverageReporter: {
       dir: require("path").join(__dirname, "./coverage/microcrm"),
       subdir: ".",
-      reporters: [{ type: "html" }, { type: "text-summary" }],
+      reporters: [{ type: "html" }, { type: "text-summary" }, { type: "lcovonly" }],
     },
     junitReporter: {
       outputDir: require("path").join(__dirname, "./coverage/microcrm"), // Modifié ici !
