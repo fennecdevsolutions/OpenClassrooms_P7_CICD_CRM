@@ -26,6 +26,7 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --no-daemon || true
 # Copy the source code and build JAR 
 COPY back/ .
+RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon
 
 # ====================================================
