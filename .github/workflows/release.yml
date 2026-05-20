@@ -49,9 +49,9 @@ jobs:
       - name: Prepare Backend JAR
         run: cp back/build/libs/*.jar ./backend-orion-${{ github.ref_name }}.jar
 
-      # ====================================================
+      # ==================================================
       # 2. Create Release and Upload Artefact
-      # ====================================================
+      # ==================================================
       - name: Create GitHub Release and Upload Artifacts
         uses: softprops/action-gh-release@v3
         with:
