@@ -3,7 +3,7 @@ name: Orion CRM - Automated Release
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+' # Pipeline activation on tags SemVer (MAJOR.MINOR.PATCH)
+      - 'v[0-9]+.[0-9]+.[0-9]+*' # Pipeline activation on tags SemVer (MAJOR.MINOR.PATCH)
 
 permissions:
   contents: write 
@@ -41,27 +41,25 @@ jobs:
           npm ci
           npm run build
 
-      # Zipper le dossier dist du frontend pour l'attacher proprement à la release
       - name: Archive Frontend Dist
         run: |
           cd front/dist/microcrm
           zip -r ../../../frontend-dist-${{ github.ref_name }}.zip .
 
-      # Préparer et renommer le JAR du backend pour la clarté de la release
       - name: Prepare Backend JAR
         run: cp back/build/libs/*.jar ./backend-orion-${{ github.ref_name }}.jar
 
       # ====================================================
-      # 2. CRÉATION AUTOMATIQUE DE LA RELEASE GITHUB
+      # 2. Create Release and Upload Artefact
       # ====================================================
       - name: Create GitHub Release and Upload Artifacts
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           draft: false
           prerelease: false
-          generate_release_notes: true # Génère AUTOMATIQUEMENT le changelog à partir des messages de commits !
+          generate_release_notes: true # Automatic generation of Change log from commit messages
           files: |
             backend-orion-${{ github.ref_name }}.jar
             frontend-dist-${{ github.ref_name }}.zip
