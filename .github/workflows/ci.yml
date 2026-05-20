@@ -11,7 +11,8 @@ on:
 permissions:
   checks: write      # For tabs and test reports creation
   pull-requests: write # For display on Pull Requests
-  contents: read   
+  contents: read
+  packages: write # for GHCR images creation   
 
 jobs:
   # ===============================
