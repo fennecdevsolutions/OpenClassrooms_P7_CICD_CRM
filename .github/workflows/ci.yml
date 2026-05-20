@@ -33,14 +33,22 @@ jobs:
         run: |
           cd back
           chmod +x gradlew
+          ./gradlew bootJar --no-daemon
           ./gradlew clean test
+
+      - name: Upload Backend JAR Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-jar 
+          path: back/build/libs/*.jar 
+          if-no-files-found: error # Stops pipeline if Jar is not found
 
       - name: Archive backend build & test reports as artefact
         uses: actions/upload-artifact@v7
         if: always() # To upload even when the tests fail
         with:
           name: backend-test-results
-          path: back/build/
+          path: back/build/  
 
       - name: Display backend test reports on Github Actions
         uses: dorny/test-reporter@v3
@@ -65,7 +73,15 @@ jobs:
         run: |
           cd front
           npm ci
+          npm run build
           npm run test:ci
+
+      - name: Upload Frontend Dist Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-dist 
+          path: front/dist/ 
+          if-no-files-found: error  # Stops pipeline if no files 
 
       - name: Archive frontend test report as artefact
         uses: actions/upload-artifact@v7
