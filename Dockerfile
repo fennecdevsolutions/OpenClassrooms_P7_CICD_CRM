@@ -56,5 +56,5 @@ USER orionuser
 WORKDIR /app
 # Copy and execute JAR file
 COPY --from=back-build /src/build/libs/*-SNAPSHOT.jar /app/microcrm.jar
-EXPOSE 4200
+EXPOSE 8080
 CMD ["java", "-jar", "/app/microcrm.jar"]
