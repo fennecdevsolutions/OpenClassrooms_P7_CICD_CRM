@@ -33,8 +33,8 @@ jobs:
         run: |
           cd back
           chmod +x gradlew
-          ./gradlew bootJar --no-daemon
           ./gradlew clean test
+          ./gradlew bootJar --no-daemon
 
       - name: Upload Backend JAR Artifact
         uses: actions/upload-artifact@v7
@@ -80,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: frontend-dist 
-          path: front/dist/ 
+          path: front/dist/microcrm 
           if-no-files-found: error  # Stops pipeline if no files 
 
       - name: Archive frontend test report as artefact
