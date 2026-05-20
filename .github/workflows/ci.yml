@@ -12,7 +12,8 @@ permissions:
   checks: write      # For tabs and test reports creation
   pull-requests: write # For display on Pull Requests
   contents: read
-  packages: write # for GHCR images creation   
+  packages: write # for GHCR images creation
+  statuses: write   
 
 jobs:
   # ===============================
@@ -57,6 +58,7 @@ jobs:
           name: Backend test reports
           path: back/build/test-results/test/*.xml
           reporter: java-junit
+          only-summary: 'false'
 
 
   build-and-test-frontend:
@@ -97,6 +99,7 @@ jobs:
           name: Frontend test reports
           path: front/coverage/microcrm/TESTS-results.xml
           reporter: java-junit
+          only-summary: 'false'
 
   # ======================================
   # SonarQube Quality & Security Analysis
