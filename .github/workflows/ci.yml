@@ -132,6 +132,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Repo name to lowercase (GHCR rule)
+      - name: Lowercase repository name
+        id: string
+        run: echo "repo_lowercase=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
       - name: Configurer Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -151,8 +156,8 @@ jobs:
           target: backend
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/orion-backend:latest
-            ghcr.io/${{ github.repository }}/orion-backend:${{ github.sha }}
+            ghcr.io/${{ steps.string.outputs.repo_lowercase }}/orion-backend:latest
+            ghcr.io/${{ steps.string.outputs.repo_lowercase }}/orion-backend:${{ github.sha }}
 
       # Build & Publish Frontend image
       - name: Build and Push Frontend Image
@@ -163,5 +168,5 @@ jobs:
           target: frontend
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/orion-frontend:latest
-            ghcr.io/${{ github.repository }}/orion-frontend:${{ github.sha }}
+            ghcr.io/${{ steps.string.outputs.repo_lowercase }}/orion-frontend:latest
+            ghcr.io/${{ steps.string.outputs.repo_lowercase }}/orion-frontend:${{ github.sha }}
