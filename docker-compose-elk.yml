@@ -1,0 +1,51 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: orion-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false # Disable security for ease of use
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g # Limit memory usage
+    ports:
+      - "9200:9200" # Port to receive data
+    volumes:
+      - es-data:/usr/share/elasticsearch/data # To store data 
+    networks:
+      - orion-elk-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: orion-logstash
+    volumes:
+      - ./elk-config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro # Use configuration file
+    ports:
+      - "5044:5044" # Port to listen to backend logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - orion-elk-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: orion-kibana
+    ports:
+      - "5601:5601" # Port for web interface
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      # Disable security and set fake secret/key to avoid error messages
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=something_secret_that_is_32_chars_long
+      - XPACK_REPORTING_ENCRYPTIONKEY=something_secret_that_is_32_chars_long
+    depends_on:
+      - elasticsearch
+    networks:
+      - orion-elk-net
+
+volumes:
+  es-data:
+    driver: local
+
+networks:
+  orion-elk-net:
+    name: orion-elk-net
+    driver: bridge

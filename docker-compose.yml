@@ -12,7 +12,10 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - LOGSTASH_HOST=orion-logstash
+      - LOGSTASH_PORT=5044
     networks:
+      - orion-elk-net
       - orion-network
     restart: unless-stopped
 
@@ -37,3 +40,5 @@ services:
 networks:
   orion-network:
     driver: bridge
+  orion-elk-net:
+    external: true
