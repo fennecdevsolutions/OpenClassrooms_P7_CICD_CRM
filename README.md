@@ -2,154 +2,73 @@
    <img src="./front/src/favicon.png" width="192px" />
 </p>
 
-# MicroCRM (P7 - Développeur Full-Stack - Java et Angular - Mettez en œuvre l'intégration et le déploiement continu d'une application Full-Stack)
+# MicroCRM - Orion
 
-MicroCRM est une application de démonstration basique ayant pour être objectif de servir de socle pour le module "P7 - Développeur Full-Stack".
+MicroCRM est une application interne simplifiée de gestion de la relation client (CRM) exploitée par les départements technique et commercial d'Orion. L'application utilise une architecture découplée avec une API back-end en Spring Boot et une interface front-end en Angular.
 
-L'application MicroCRM est une implémentation simplifiée d'un ["CRM" (Customer Relationship Management)](https://fr.wikipedia.org/wiki/Gestion_de_la_relation_client). Les fonctionnalités sont limitées à la création, édition et la visualisations des individus liés à des organisations.
+## Architecture du Projet
 
-![Page d'accueil](./misc/screenshots/screenshot_1.png)
-![Édition de la fiche d'un individu](./misc/screenshots/screenshot_2.png)
+Ce dépôt est un monorepo structuré de la manière suivante :
+- /back : Code source de l'API Backend (Java Spring Boot 3 / Gradle).
+- /front : Code source de l'interface Frontend (Angular 17).
+- Dockerfile : Fichier de configuration multi-stage pour la conteneurisation.
+- docker-compose.yml : Orchestration de l'application (Services frontend et backend).
+- docker-compose-elk.yml : Orchestration de la stack d'observabilité (Elasticsearch, Logstash, Kibana, APM Server).
 
-## Code source
+---
 
-### Organisation
+## Prérequis
 
-Ce [monorepo](https://en.wikipedia.org/wiki/Monorepo) contient les 2 composantes du projet "MicroCRM":
+Pour exécuter ou déployer l'application, les outils suivants doivent être installés :
+- Docker
+- Optionnel (développement local sans conteneur) : OpenJDK 17+ et NodeJS
 
-- La partie serveur (ou "backend"), en Java SpringBoot 3;
-- La partie cliente (ou "frontend"), en Angular 17.
+---
 
-### Démarrer avec les sources
+## Instructions de Déploiement
 
-#### Serveur
-
-##### Dépendances
-
-- [OpenJDK >= 17](https://openjdk.org/)
-
-##### Procédure
-
-1. Se positionner dans le répertoire `back` avec une invite de commande:
-
-   ```shell
-   cd back
-   ```
-
-2. Construire le JAR:
-
-   ```shell
-   # Sur Linux
-   ./gradlew build
-
-   # Sur Windows
-   gradlew.bat build
-   ```
-
-3. Démarrer le service:
-
-   ```shell
-   java -jar build/libs/microcrm-0.0.1-SNAPSHOT.jar
-   ```
-
-Puis ouvrir l'URL http://localhost:8080 dans votre navigateur.
-
-#### Client
-
-##### Dépendances
-
-- [NPM >= 10.2.4](https://www.npmjs.com/)
-
-##### Procédure
-
-1. Se positionner dans le répertoire `front` avec une invite de commande:
-
-   ```shell
-   cd front
-   ```
-
-2. (La première fois seulement) Installer les dépendances NodeJS:
-
-   ```shell
-   npm install
-   ```
-
-3. Démarrer le service de développement:
-
-   ```shell
-   npx @angular/cli serve
-   ```
-
-Puis ouvrir l'URL http://localhost:4200 dans votre navigateur.
-
-### Exécution des tests
-
-#### Client
-
-**Dépendances**
-
-- Google Chrome ou Chromium
-
-Dans votre terminal:
-
+### 1. Démarrage de l'Application (Frontend & Backend)
+Pour construire les images et lancer l'application CRM, exécutez la commande suivante à la racine du projet :
 ```shell
-cd front
-CHROME_BIN=</path/to/google/chrome> npm test
+docker compose up --build -d
 ```
+- Interface CRM (Frontend) : Disponible sur https://localhost .
+- API (Backend) : Disponible sur http://localhost:8080.
 
-#### Serveur
+### 2. Démarrage de la Stack d'Observabilité (Optionnel)
+Pour activer la centralisation des logs et le suivi des performances via la stack ELK, exécutez :
+```shell
+docker compose -f docker-compose-elk.yml up -d
+```
+- Dashboard Kibana : Disponible sur http://localhost:5601.
 
-Dans votre terminal:
+### 3. Arrêt des Services
+Pour arrêter l'ensemble des conteneurs en cours d'exécution :
+```shell
+docker compose down
+docker compose -f docker-compose-elk.yml down
+```
+---
 
+## Exécution des Tests en Local
+
+### Backend (Java)
+Pour rejouer les tests unitaires du serveur :
 ```shell
 cd back
 ./gradlew test
 ```
-
-### Images Docker
-
-#### Client
-
-##### Construire l'image
-
+### Frontend (Angular)
+Pour rejouer les tests de l'interface cliente :
 ```shell
-docker build --target front -t orion-microcrm-front:latest .
+cd front
+npm install
+npm test
 ```
+---
 
-##### Exécuter l'image
+## Pipeline CI/CD (GitHub Actions)
 
-```shell
-docker run -it --rm -p 80:80 -p 443:443 orion-microcrm-front:latest
-```
-
-L'application sera disponible sur https://localhost.
-
-#### Serveur
-
-##### Construire l'image
-
-```shell
-docker build --target back -t orion-microcrm-back:latest .
-```
-
-##### Exécuter l'image
-
-```shell
-docker run -it --rm -p 8080:8080 orion-microcrm-back:latest
-```
-
-L'API sera disponible sur http://localhost:8080.
-
-#### Tout en un
-
-```shell
-docker build --target standalone -t orion-microcrm-standalone:latest .
-```
-
-##### Exécuter l'image
-
-```shell
-docker run -it --rm -p 8080:8080 -p 80:80 -p 443:443 orion-microcrm-standalone:latest
-```
-
-L'application sera disponible sur https://localhost et l'API sur http://localhost:8080.
+L'industrialisation du projet repose sur deux workflows automatisés :
+1. Intégration Continue (ci.yml) : Déclenché à chaque push ou Pull Request. Il valide le build, exécute les tests unitaires, lance un scan de sécurité et de qualité sur SonarQube Cloud, puis publie les images Docker de production sur le registre GitHub Packages (GHCR).
+2. Livraison Automatisée (release.yml) : Déclenché lors de la création d'un tag de version (ex: v1.1.0). Il génère automatiquement les notes de version et publie officiellement les artefacts de production (fichiers .jar et .zip) sur GitHub.
